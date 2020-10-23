@@ -98,12 +98,35 @@ class SudokuGenerator:
         
         while not self.is_solved:
             self.find_pos_value()
+    
+    def remove_values(self, difficulty):
+        """Removes some values. The number of values removed depend on the difficulty."""
+
+        difficulty_remove_num_dict = {
+            "easy": 40,
+            "medium": 50,
+            "hard": 60,
+        }
+
+        num_values_removed = difficulty_remove_num_dict[difficulty]
+        for _ in range(num_values_removed):
+            row = randint(0, 8)
+            col = randint(0, 8)
+
+            self.grid[row][col] = 0
 
 
 if __name__ == "__main__":
     Generator = SudokuGenerator()
     Generator.generate_board()
     
+    for row in Generator.grid:
+        print(row)
+    print("-" * 27,"\n\n\n")
+
+    Generator.remove_values("hard")
+
+    print("-" * 27)
     for row in Generator.grid:
         print(row)
 
