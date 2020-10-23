@@ -1,5 +1,4 @@
-from random import randint
-import numpy as np
+from random import randint, choice
 
 
 class SudokuGenerator:
@@ -57,6 +56,7 @@ class SudokuGenerator:
 
         empty_pos = self.find_empty()
 
+        # if no empty position is found then this means the sudoku board is completely filled
         if not empty_pos:
             self.is_solved = True
             return
@@ -67,18 +67,27 @@ class SudokuGenerator:
         random_num = randint(1, 9)
         same_num_pos = self.check_num(num=random_num, row=row, col=col)
 
+        # checks is the random number is valid or not
+        # if the number is valid
         if not same_num_pos:
             self.grid[row][col] = random_num
 
+        # if it is not valid
         else:
+            # the for loop and if would check if any number is valid at the particular position
+            valid_nums = []
+            
             for num in range(1, 10):
                 if not self.check_num(num=num, row=row, col=col):
-                    self.grid[row][col] = num
-                    break
+                    valid_nums.append(num)
 
-            else:                
+            if len(valid_nums) > 0:
+                self.grid[row][col] = choice(valid_nums)
+
+            # this else would clear the grid from te point causing error
+            else:             
                 row, col = same_num_pos
-                for temp_row in range(row, 9):
+                for row in range(row, 9):
                     while col < 9:
                         self.grid[row][col] = 0
                         col += 1
@@ -94,5 +103,7 @@ class SudokuGenerator:
 if __name__ == "__main__":
     Generator = SudokuGenerator()
     Generator.generate_board()
-    # print(np.array(Generator.grid))
+    
+    for row in Generator.grid:
+        print(row)
 
