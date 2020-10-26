@@ -20,11 +20,13 @@ class PygameConfig:
 
         self.BACKGROUND_COLOR = (200, 200, 200)
         self.font = pygame.font.SysFont("comicsansms", 36)
+
+        self.BOX_LINES_THICKNESS = 2
     
-    def write_center_text(self, text, rect):
+    def write_center_text(self, text, rect, color):
         """Writes the given text at the center of the given rect"""
 
-        rendered_text = self.font.render(str(text).strip(), True, (0, 0, 0))
+        rendered_text = self.font.render(str(text).strip(), True, color)
         text_rect = rendered_text.get_rect()
         text_rect.center = rect.center
 
