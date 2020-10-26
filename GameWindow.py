@@ -7,13 +7,19 @@ settings = PygameConfig()
 class GameWindow:
     def __init__(self, difficulty, settings):
         self.settings = settings
+        
         self.loop_running = True
         self.sudoku_surface = pygame.Surface((self.settings.SUDOKU_WIDTH, self.settings.SUDOKU_HEIGHT))
+        
         self.SudokuGenerator = SudokuGenerator()
         self.SudokuGenerator.generate_board()
         self.SudokuGenerator.remove_values(difficulty)
         self.get_grid_dict()
-        self.selected_box = self.SudokuGenerator.grid[4][4]
+        
+        self.selected_row = 4
+        self.selected_col = 4
+
+        self.pressed_key = None
 
     def get_grid_dict(self):
         """Gets a 2d list containing dicts instead of just numbers."""
@@ -54,7 +60,8 @@ class GameWindow:
                     self.SudokuGenerator.grid[row_num][col_num]["color"] = (0, 0, 255)
 
                     if pygame.mouse.get_pressed()[0] == 1:
-                        self.selected_box = self.SudokuGenerator.grid[row_num][col_num]
+                        self.selected_row = row_num
+                        self.selected_col = col_num
                     
                 else:
                     self.SudokuGenerator.grid[row_num][col_num]["color"] = (0, 0, 0)
@@ -74,7 +81,7 @@ class GameWindow:
                 if num_dict["value"] != 0:
                     self.sudoku_surface.blit(text["text"], text["rect"])
         
-        pygame.draw.rect(self.sudoku_surface, (0, 0, 255), self.selected_box["rect"], 3)
+        pygame.draw.rect(self.sudoku_surface, (0, 0, 255), self.SudokuGenerator.grid[self.selected_row][self.selected_col]["rect"], 3)
 
     def draw_window(self):
         """Draws the game window."""
@@ -87,9 +94,38 @@ class GameWindow:
     def event_loop(self):
         """The event loop for events like closing he window."""
 
+        self.pressed_key = None
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.loop_running = False
+            
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    self.pressed_key = 1
+                elif event.key == pygame.K_2:
+                    self.pressed_key = 2
+                elif event.key == pygame.K_3:
+                    self.pressed_key = 3
+                elif event.key == pygame.K_4:
+                    self.pressed_key = 4
+                elif event.key == pygame.K_5:
+                    self.pressed_key = 5
+                elif event.key == pygame.K_6:
+                    self.pressed_key = 6
+                elif event.key == pygame.K_7:
+                    self.pressed_key = 7
+                elif event.key == pygame.K_8:
+                    self.pressed_key = 8
+                elif event.key == pygame.K_9:
+                    self.pressed_key = 9
+    
+    def update_grid(self):
+        """Updates the grid when the user enters a number."""
+
+        if self.pressed_key:
+            if self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"]:
+                self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"] = self.pressed_key
 
     def main(self):
         """Main loop of the lobby window."""
@@ -98,6 +134,8 @@ class GameWindow:
 
             self.event_loop()
             self.make_sudoku_mouse_responsive()
+
+            self.update_grid()
 
             self.draw_window()
             pygame.display.update()
