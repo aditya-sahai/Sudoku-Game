@@ -98,7 +98,20 @@ class SudokuGenerator:
         
         while not self.is_solved:
             self.find_pos_value()
-    
+        
+    def get_random_pos(self):
+        """Returns row, col where the value has not been removed."""
+
+        row = randint(0, 8)
+        col = randint(0, 8)
+
+        if (row, col) not in self.pos_num_removed:
+            self.pos_num_removed.append((row, col))
+            return (row, col) 
+
+        else:
+            return self.get_random_pos()
+
     def remove_values(self, difficulty):
         """Removes some values. The number of values removed depend on the difficulty."""
 
@@ -108,11 +121,11 @@ class SudokuGenerator:
             "hard": 60,
         }
 
-        num_values_removed = difficulty_remove_num_dict[difficulty]
-        for _ in range(num_values_removed):
-            row = randint(0, 8)
-            col = randint(0, 8)
+        self.num_values_removed = difficulty_remove_num_dict[difficulty]
+        self.pos_num_removed = []
 
+        for _ in range(self.num_values_removed):
+            row, col = self.get_random_pos()
             self.grid[row][col] = 0
 
 

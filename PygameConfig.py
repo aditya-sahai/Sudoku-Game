@@ -19,6 +19,19 @@ class PygameConfig:
         self.SUDOKU_Y = self.HEIGHT - self.BLOCK_SIZE - self.SUDOKU_HEIGHT
 
         self.BACKGROUND_COLOR = (200, 200, 200)
+        self.font = pygame.font.SysFont("comicsansms", 36)
+    
+    def write_center_text(self, text, rect):
+        """Writes the given text at the center of the given rect"""
+
+        rendered_text = self.font.render(str(text).strip(), True, (0, 0, 0))
+        text_rect = rendered_text.get_rect()
+        text_rect.center = rect.center
+
+        return {
+            "text": rendered_text,
+            "rect": text_rect,
+        }
 
 
 if __name__ == "__main__":

@@ -48,6 +48,10 @@ class GameWindow:
 
                 pygame.draw.rect(self.sudoku_surface, (255, 255, 255), num_dict["rect"])
                 pygame.draw.rect(self.sudoku_surface, num_dict["color"], num_dict["rect"], 1)
+                text = self.settings.write_center_text(num_dict["value"], num_dict["rect"])
+
+                if num_dict["value"] != 0:
+                    self.sudoku_surface.blit(text["text"], text["rect"])
 
 
     def draw_window(self):
@@ -80,4 +84,10 @@ class GameWindow:
 
 if __name__ == "__main__":
     Game = GameWindow("easy")
+    Game.main()
+
+    Game = GameWindow("medium")
+    Game.main()
+
+    Game = GameWindow("hard")
     Game.main()
