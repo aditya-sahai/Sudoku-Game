@@ -13,6 +13,7 @@ class GameWindow:
         self.SudokuGenerator.generate_board()
         self.SudokuGenerator.remove_values(difficulty)
         self.get_grid_dict()
+        self.selected_box = self.SudokuGenerator.grid[4][4]
 
     def get_grid_dict(self):
         """Gets a 2d list containing dicts instead of just numbers."""
@@ -40,7 +41,7 @@ class GameWindow:
                     "color": (0, 0, 0),
                 }
 
-    def make_sudoku_hover_sensitive(self):
+    def make_sudoku_mouse_responsive(self):
         """Changes the color of the border if the mouse hovers on a rect."""
 
         mouse_pos = pygame.mouse.get_pos()
@@ -51,7 +52,10 @@ class GameWindow:
             for col_num, num_dict in enumerate(row):
                 if num_dict["rect"].collidepoint(mouse_x, mouse_y):
                     self.SudokuGenerator.grid[row_num][col_num]["color"] = (0, 0, 255)
-                
+
+                    if pygame.mouse.get_pressed()[0] == 1:
+                        self.selected_box = self.SudokuGenerator.grid[row_num][col_num]
+                    
                 else:
                     self.SudokuGenerator.grid[row_num][col_num]["color"] = (0, 0, 0)
 
@@ -69,7 +73,8 @@ class GameWindow:
 
                 if num_dict["value"] != 0:
                     self.sudoku_surface.blit(text["text"], text["rect"])
-
+        
+        pygame.draw.rect(self.sudoku_surface, (0, 0, 255), self.selected_box["rect"], 3)
 
     def draw_window(self):
         """Draws the game window."""
@@ -92,7 +97,7 @@ class GameWindow:
         while self.loop_running:
 
             self.event_loop()
-            self.make_sudoku_hover_sensitive()
+            self.make_sudoku_mouse_responsive()
 
             self.draw_window()
             pygame.display.update()
