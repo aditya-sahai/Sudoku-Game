@@ -1,21 +1,20 @@
 import pygame
 from PygameConfig import PygameConfig
 from SudokuGenerator import SudokuGenerator
-settings = PygameConfig()
 
 
 class GameWindow:
     def __init__(self, difficulty, settings):
         self.settings = settings
-        
+
         self.loop_running = True
         self.sudoku_surface = pygame.Surface((self.settings.SUDOKU_WIDTH, self.settings.SUDOKU_HEIGHT))
-        
+
         self.SudokuGenerator = SudokuGenerator()
         self.SudokuGenerator.generate_board()
         self.SudokuGenerator.remove_values(difficulty)
         self.get_grid_dict()
-        
+
         self.selected_row = 4
         self.selected_col = 4
 
@@ -35,7 +34,7 @@ class GameWindow:
             for col_num in range(9):
                 width = self.settings.BLOCK_SIZE
                 x = col_num * self.settings.BLOCK_SIZE + self.settings.BOX_LINES_THICKNESS
-                
+
                 if col_num % 3 == 0 and col_num != 0:
                     x += self.settings.BOX_LINES_THICKNESS
                     width -= self.settings.BOX_LINES_THICKNESS
@@ -76,7 +75,12 @@ class GameWindow:
 
                 pygame.draw.rect(self.sudoku_surface, (255, 255, 255), num_dict["rect"])
                 pygame.draw.rect(self.sudoku_surface, num_dict["color"], num_dict["rect"], 1)
-                text = self.settings.write_center_text(num_dict["value"], num_dict["rect"], (0, 0, 0))
+                text = self.settings.write_center_text(
+                    num_dict["value"],
+                    num_dict["rect"],
+                    (0, 0, 0),
+                    self.settings.SUDOKU_NUMBER_FONT
+                )
 
                 if num_dict["value"] != 0:
                     self.sudoku_surface.blit(text["text"], text["rect"])
@@ -90,6 +94,15 @@ class GameWindow:
         
         self.draw_sudoku()
         self.settings.win.blit(self.sudoku_surface, (self.settings.SUDOKU_X, self.settings.SUDOKU_Y))
+
+        # pygame.draw.rect(self.settings.win, (0, 0, 0), self.settings.GAME_WINDOW_HAEDING_RECT)
+        text = self.settings.write_center_text(
+            "Sudoku Masters",
+            self.settings.GAME_WINDOW_HAEDING_RECT, 
+            (0, 0, 0),
+            self.settings.HEADNG_FONT
+        )
+        self.settings.win.blit(text["text"], text["rect"])
 
     def event_loop(self):
         """The event loop for events like closing he window."""
@@ -119,7 +132,7 @@ class GameWindow:
                     self.pressed_key = 8
                 elif event.key == pygame.K_9:
                     self.pressed_key = 9
-    
+
     def update_grid(self):
         """Updates the grid when the user enters a number."""
 
@@ -146,6 +159,8 @@ class GameWindow:
 if __name__ == "__main__":
     # Game = GameWindow("easy")
     # # Game.main()
+
+    settings = PygameConfig()
 
     Game = GameWindow("medium", settings)
     Game.main()
