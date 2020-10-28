@@ -27,9 +27,9 @@ class PygameConfig:
 
         self.GAME_WINDOW_HEADING_X = self.BLOCK_SIZE
         self.GAME_WINDOW_HEADING_Y = self.BLOCK_SIZE
-        self.GAME_WINDOW_HEADING_WIDTH = 1.5 * self.SUDOKU_WIDTH
+        self.GAME_WINDOW_HEADING_WIDTH = self.SUDOKU_WIDTH * 1.5
         self.GAME_WINDOW_HEADING_HEIGHT = self.SUDOKU_Y - self.GAME_WINDOW_HEADING_Y - self.BLOCK_SIZE
-        self.GAME_WINDOW_HAEDING_RECT = pygame.Rect(
+        self.GAME_WINDOW_HEADING_RECT = pygame.Rect(
              self.GAME_WINDOW_HEADING_X,
              self.GAME_WINDOW_HEADING_Y,
              self.GAME_WINDOW_HEADING_WIDTH,
@@ -38,6 +38,44 @@ class PygameConfig:
 
         self.HEADNG_FONT = pygame.font.Font("Fonts/Brianne.ttf", 150)
         self.HEADNG_FONT.set_underline(True)
+
+        self.TIME_BOX_X = self.SUDOKU_X + self.SUDOKU_WIDTH + self.BLOCK_SIZE
+        self.TIME_BOX_Y = self.SUDOKU_Y
+        self.IME_BOX_WIDTH = self.BLOCK_SIZE * 4
+        self.TIME_BOX_HEIGHT = self.BLOCK_SIZE * 3
+        self.TIME_BOX_RECT = pygame.Rect(
+            self.TIME_BOX_X,
+            self.TIME_BOX_Y,
+            self.IME_BOX_WIDTH,
+            self.TIME_BOX_HEIGHT
+        )
+        self.TIME_BOX_COLOR = (100, 100, 100)
+
+        self.SOLVE_BOX_X = self.SUDOKU_X + self.SUDOKU_WIDTH + self.BLOCK_SIZE
+        self.SOLVE_BOX_Y = self.TIME_BOX_Y + self.TIME_BOX_HEIGHT + self.BLOCK_SIZE
+        self.SOLVE_BOX_WIDTH = self.BLOCK_SIZE * 4
+        self.SOLVE_BOX_HEIGHT = self.BLOCK_SIZE * 2
+        self.SOLVE_BOX_RECT = pygame.Rect(
+            self.SOLVE_BOX_X,
+            self.SOLVE_BOX_Y,
+            self.SOLVE_BOX_WIDTH,
+            self.SOLVE_BOX_HEIGHT
+        )
+        self.SOLVE_BOX_COLOR = (75, 255, 75)
+
+        self.CHECK_BOX_X = self.SUDOKU_X + self.SUDOKU_WIDTH + self.BLOCK_SIZE
+        self.CHECK_BOX_Y = self.SOLVE_BOX_Y + self.SOLVE_BOX_HEIGHT + self.BLOCK_SIZE
+        self.CHECK_BOX_WIDTH = self.BLOCK_SIZE * 4
+        self.CHECK_BOX_HEIGHT = self.BLOCK_SIZE * 2
+        self.CHECK_BOX_RECT = pygame.Rect(
+            self.CHECK_BOX_X,
+            self.CHECK_BOX_Y,
+            self.CHECK_BOX_WIDTH,
+            self.CHECK_BOX_HEIGHT
+        )
+        self.CHECK_BOX_COLOR = (75, 255, 75)
+
+        self.BUTTON_FONT = pygame.font.Font("Fonts/Howkins.ttf", 70)
     
     def write_center_text(self, text, rect, color, font):
         """Writes the given text at the center of the given rect"""

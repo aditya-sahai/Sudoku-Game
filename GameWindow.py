@@ -87,6 +87,37 @@ class GameWindow:
         
         pygame.draw.rect(self.sudoku_surface, (0, 0, 255), self.SudokuGenerator.grid[self.selected_row][self.selected_col]["rect"], 3)
 
+    def draw_utility_boxes(self):
+        """Draws the time button, solve button and check box button."""
+
+        pygame.draw.rect(self.settings.win, self.settings.TIME_BOX_COLOR, self.settings.TIME_BOX_RECT)
+        pygame.draw.rect(self.settings.win, self.settings.SOLVE_BOX_COLOR, self.settings.SOLVE_BOX_RECT)
+        pygame.draw.rect(self.settings.win, self.settings.CHECK_BOX_COLOR, self.settings.CHECK_BOX_RECT)
+
+        pygame.draw.rect(
+            self.settings.win,
+            (250, 250, 250),
+            (self.settings.TIME_BOX_RECT.x + 2, self.settings.TIME_BOX_RECT.y + 2, self.settings.TIME_BOX_RECT.width - 4, self.settings.TIME_BOX_RECT.height - 4)
+        )
+        pygame.draw.rect(self.settings.win, self.settings.SOLVE_BOX_COLOR, self.settings.SOLVE_BOX_RECT)
+        pygame.draw.rect(self.settings.win, self.settings.CHECK_BOX_COLOR, self.settings.CHECK_BOX_RECT)
+
+        text = self.settings.write_center_text(
+            "Solve",
+            self.settings.SOLVE_BOX_RECT,
+            (0, 0, 0),
+            self.settings.BUTTON_FONT
+        )
+        self.settings.win.blit(text["text"], text["rect"])
+
+        text = self.settings.write_center_text(
+            "Check Box",
+            self.settings.CHECK_BOX_RECT, 
+            (0, 0, 0),
+            self.settings.BUTTON_FONT
+        )
+        self.settings.win.blit(text["text"], text["rect"])
+
     def draw_window(self):
         """Draws the game window."""
 
@@ -95,14 +126,15 @@ class GameWindow:
         self.draw_sudoku()
         self.settings.win.blit(self.sudoku_surface, (self.settings.SUDOKU_X, self.settings.SUDOKU_Y))
 
-        # pygame.draw.rect(self.settings.win, (0, 0, 0), self.settings.GAME_WINDOW_HAEDING_RECT)
         text = self.settings.write_center_text(
             "Sudoku Masters",
-            self.settings.GAME_WINDOW_HAEDING_RECT, 
+            self.settings.GAME_WINDOW_HEADING_RECT, 
             (0, 0, 0),
             self.settings.HEADNG_FONT
         )
         self.settings.win.blit(text["text"], text["rect"])
+        
+        self.draw_utility_boxes()
 
     def event_loop(self):
         """The event loop for events like closing he window."""
