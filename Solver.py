@@ -1,7 +1,7 @@
 class Solver:
     def __init__(self, board):
         self.grid = board
-        self.get_grid_dict()
+        # self.get_grid_dict()
     
     def get_grid_dict(self):
         """Changes the 2D list to a 2D list containing dictionaries."""

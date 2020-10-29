@@ -1,6 +1,7 @@
 import pygame
 from PygameConfig import PygameConfig
 from SudokuGenerator import SudokuGenerator
+from Solver import Solver
 
 
 class GameWindow:
@@ -15,10 +16,14 @@ class GameWindow:
         self.SudokuGenerator.remove_values(difficulty)
         self.get_grid_dict()
 
+        self.Solver = Solver(self.SudokuGenerator.grid)
+
         self.selected_row = 4
         self.selected_col = 4
 
         self.pressed_key = None
+
+        self.is_solving = False
 
     def get_grid_dict(self):
         """Gets a 2d list containing dicts instead of just numbers."""
@@ -117,6 +122,32 @@ class GameWindow:
             self.settings.BUTTON_FONT
         )
         self.settings.win.blit(text["text"], text["rect"])
+    
+    def make_buttons_responsive(self):
+        """Change the color pf the buttons when hovered over and makes them functional."""
+
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_is_pressed = pygame.mouse.get_pressed()[0] == 1
+        button = None
+
+        if self.settings.SOLVE_BOX_RECT.collidepoint(mouse_pos):
+            self.settings.SOLVE_BOX_COLOR = (255, 0, 0)
+            button = "solve"
+        
+        else:
+            self.settings.SOLVE_BOX_COLOR = (75, 255, 75)
+        
+        if self.settings.CHECK_BOX_RECT.collidepoint(mouse_pos):
+            self.settings.CHECK_BOX_COLOR = (255, 0, 0)
+            button = "check"
+        
+        else:
+            self.settings.CHECK_BOX_COLOR = (75, 255, 75)
+        
+        return {
+            "button": button,
+            "is-pressed": mouse_is_pressed,
+        }
 
     def draw_window(self):
         """Draws the game window."""
@@ -143,7 +174,9 @@ class GameWindow:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.loop_running = False
+                # self.loop_running = False
+                pygame.quit()
+                exit()
             
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
@@ -171,6 +204,44 @@ class GameWindow:
         if self.pressed_key:
             if self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"]:
                 self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"] = self.pressed_key
+    
+    def solve(self):
+        """Solves the board."""
+
+        empty_pos = self.Solver.find_empty()
+        self.event_loop()
+        
+        if not empty_pos:
+            return True
+        
+        else:
+            row, col = empty_pos
+
+        for num in range(1, 10):
+            if self.Solver.check_num(num, empty_pos):
+                self.SudokuGenerator.grid[row][col]["value"] = num
+                self.selected_row = row
+                self.selected_col = col
+                
+                self.draw_window()
+                pygame.display.update()
+
+                self.settings.clock.tick(self.settings.FPS)
+
+                if self.solve():
+                    return True
+
+                self.SudokuGenerator.grid[row][col]["value"] = 0
+
+        return False
+    
+    def restore_grid(self):
+        """Restores the grid."""
+
+        for row_num, row in enumerate(self.SudokuGenerator.grid):
+            for col_num, num_dict in enumerate(row):
+                if num_dict["can-change"]:
+                    self.SudokuGenerator.grid[row_num][col_num]["value"] = 0
 
     def main(self):
         """Main loop of the lobby window."""
@@ -179,6 +250,14 @@ class GameWindow:
 
             self.event_loop()
             self.make_sudoku_mouse_responsive()
+            button_mouse_status = self.make_buttons_responsive()
+
+            if button_mouse_status["button"] == "solve":
+                self.is_solving = button_mouse_status["is-pressed"]
+            
+            if self.is_solving:
+                self.restore_grid()
+                self.solve()
 
             self.update_grid()
 
