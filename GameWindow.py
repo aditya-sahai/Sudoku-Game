@@ -24,6 +24,7 @@ class GameWindow:
         self.pressed_key = None
 
         self.is_solving = False
+        self.is_solved = False
 
     def get_grid_dict(self):
         """Gets a 2d list containing dicts instead of just numbers."""
@@ -92,61 +93,41 @@ class GameWindow:
         
         pygame.draw.rect(self.sudoku_surface, (0, 0, 255), self.SudokuGenerator.grid[self.selected_row][self.selected_col]["rect"], 3)
 
-    def draw_utility_boxes(self):
+    def draw_utility_box(self, rect, color, text):
         """Draws the time button, solve button and check box button."""
 
-        pygame.draw.rect(self.settings.win, self.settings.TIME_BOX_COLOR, self.settings.TIME_BOX_RECT)
-        pygame.draw.rect(self.settings.win, self.settings.SOLVE_BOX_COLOR, self.settings.SOLVE_BOX_RECT)
-        pygame.draw.rect(self.settings.win, self.settings.CHECK_BOX_COLOR, self.settings.CHECK_BOX_RECT)
+        pygame.draw.rect(self.settings.win, color, rect)
 
-        pygame.draw.rect(
-            self.settings.win,
-            (250, 250, 250),
-            (self.settings.TIME_BOX_RECT.x + 2, self.settings.TIME_BOX_RECT.y + 2, self.settings.TIME_BOX_RECT.width - 4, self.settings.TIME_BOX_RECT.height - 4)
-        )
-        pygame.draw.rect(self.settings.win, self.settings.SOLVE_BOX_COLOR, self.settings.SOLVE_BOX_RECT)
-        pygame.draw.rect(self.settings.win, self.settings.CHECK_BOX_COLOR, self.settings.CHECK_BOX_RECT)
+        if rect == self.settings.TIME_BOX_RECT:
+            pygame.draw.rect(
+                self.settings.win,
+                (250, 250, 250),
+                (self.settings.TIME_BOX_RECT.x + 2, self.settings.TIME_BOX_RECT.y + 2, self.settings.TIME_BOX_RECT.width - 4, self.settings.TIME_BOX_RECT.height - 4)
+            )
 
-        text = self.settings.write_center_text(
-            "Solve",
-            self.settings.SOLVE_BOX_RECT,
+        box_text = self.settings.write_center_text(
+            str(text).strip(),
+            rect,
             (0, 0, 0),
             self.settings.BUTTON_FONT
         )
-        self.settings.win.blit(text["text"], text["rect"])
-
-        text = self.settings.write_center_text(
-            "Check Box",
-            self.settings.CHECK_BOX_RECT, 
-            (0, 0, 0),
-            self.settings.BUTTON_FONT
-        )
-        self.settings.win.blit(text["text"], text["rect"])
+        self.settings.win.blit(box_text["text"], box_text["rect"])
     
-    def make_buttons_responsive(self):
+    def make_buttons_responsive(self, rect):
         """Change the color pf the buttons when hovered over and makes them functional."""
 
         mouse_pos = pygame.mouse.get_pos()
         mouse_is_pressed = pygame.mouse.get_pressed()[0] == 1
-        button = None
+        color = (75, 255, 75)
+        is_hovering = False
 
-        if self.settings.SOLVE_BOX_RECT.collidepoint(mouse_pos):
-            self.settings.SOLVE_BOX_COLOR = (255, 0, 0)
-            button = "solve"
-        
-        else:
-            self.settings.SOLVE_BOX_COLOR = (75, 255, 75)
-        
-        if self.settings.CHECK_BOX_RECT.collidepoint(mouse_pos):
-            self.settings.CHECK_BOX_COLOR = (255, 0, 0)
-            button = "check"
-        
-        else:
-            self.settings.CHECK_BOX_COLOR = (75, 255, 75)
+        if rect.collidepoint(mouse_pos):
+            color = (255, 0, 0)
+            is_hovering = True
         
         return {
-            "button": button,
-            "is-pressed": mouse_is_pressed,
+            "is-pressed": mouse_is_pressed and not self.is_solving and is_hovering,
+            "color": color,
         }
 
     def draw_window(self):
@@ -165,7 +146,10 @@ class GameWindow:
         )
         self.settings.win.blit(text["text"], text["rect"])
         
-        self.draw_utility_boxes()
+        self.draw_utility_box(self.settings.TIME_BOX_RECT, self.settings.TIME_BOX_COLOR, "Time")
+        self.draw_utility_box(self.settings.SOLVE_BOX_RECT, self.settings.SOLVE_BOX_COLOR, "Solve")
+        self.draw_utility_box(self.settings.CHECK_BOX_RECT, self.settings.CHECK_BOX_COLOR, "Check Box")
+        self.draw_utility_box(self.settings.SUBMIT_BOX_RECT, self.settings.SUBMIT_BOX_COLOR, "Submit")
 
     def event_loop(self):
         """The event loop for events like closing he window."""
@@ -179,34 +163,44 @@ class GameWindow:
                 exit()
             
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_BACKSPACE:
+                    self.pressed_key = 0
+                elif event.key == pygame.K_1 or event.key == pygame.K_KP1:
                     self.pressed_key = 1
-                elif event.key == pygame.K_2:
+                elif event.key == pygame.K_2 or event.key == pygame.K_KP2:
                     self.pressed_key = 2
-                elif event.key == pygame.K_3:
+                elif event.key == pygame.K_3 or event.key == pygame.K_KP3:
                     self.pressed_key = 3
-                elif event.key == pygame.K_4:
+                elif event.key == pygame.K_4 or event.key == pygame.K_KP4:
                     self.pressed_key = 4
-                elif event.key == pygame.K_5:
+                elif event.key == pygame.K_5 or event.key == pygame.K_KP5:
                     self.pressed_key = 5
-                elif event.key == pygame.K_6:
+                elif event.key == pygame.K_6 or event.key == pygame.K_KP6:
                     self.pressed_key = 6
-                elif event.key == pygame.K_7:
+                elif event.key == pygame.K_7 or event.key == pygame.K_KP7:
                     self.pressed_key = 7
-                elif event.key == pygame.K_8:
+                elif event.key == pygame.K_8 or event.key == pygame.K_KP8:
                     self.pressed_key = 8
-                elif event.key == pygame.K_9:
+                elif event.key == pygame.K_9 or event.key == pygame.K_KP9:
                     self.pressed_key = 9
 
     def update_grid(self):
         """Updates the grid when the user enters a number."""
 
-        if self.pressed_key:
+        if self.pressed_key != None:
             if self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"]:
                 self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"] = self.pressed_key
     
     def solve(self):
         """Solves the board."""
+
+        solve_mouse_status = self.make_buttons_responsive(self.settings.SOLVE_BOX_RECT)
+        check_box_mouse_status = self.make_buttons_responsive(self.settings.CHECK_BOX_RECT)
+        submit_mouse_status = self.make_buttons_responsive(self.settings.SUBMIT_BOX_RECT)
+
+        self.settings.SOLVE_BOX_COLOR = solve_mouse_status["color"]
+        self.settings.CHECK_BOX_COLOR = check_box_mouse_status["color"]
+        self.settings.SUBMIT_BOX_COLOR = submit_mouse_status["color"]
 
         empty_pos = self.Solver.find_empty()
         self.event_loop()
@@ -226,7 +220,7 @@ class GameWindow:
                 self.draw_window()
                 pygame.display.update()
 
-                self.settings.clock.tick(self.settings.FPS)
+                self.settings.clock.tick(self.settings.FPS * 4)
 
                 if self.solve():
                     return True
@@ -250,16 +244,25 @@ class GameWindow:
 
             self.event_loop()
             self.make_sudoku_mouse_responsive()
-            button_mouse_status = self.make_buttons_responsive()
-
-            if button_mouse_status["button"] == "solve":
-                self.is_solving = button_mouse_status["is-pressed"]
             
-            if self.is_solving:
+            solve_mouse_status = self.make_buttons_responsive(self.settings.SOLVE_BOX_RECT)
+            check_box_mouse_status = self.make_buttons_responsive(self.settings.CHECK_BOX_RECT)
+            submit_mouse_status = self.make_buttons_responsive(self.settings.SUBMIT_BOX_RECT)
+
+            self.settings.SOLVE_BOX_COLOR = solve_mouse_status["color"]
+            self.settings.CHECK_BOX_COLOR = check_box_mouse_status["color"]
+            self.settings.SUBMIT_BOX_COLOR = submit_mouse_status["color"]
+
+            self.is_solving = solve_mouse_status["is-pressed"]
+
+            if self.is_solving and not self.is_solved:
                 self.restore_grid()
                 self.solve()
+                self.is_solved = True
+                self.is_solving = False
 
-            self.update_grid()
+            if not self.is_solved:
+                self.update_grid()
 
             self.draw_window()
             pygame.display.update()
