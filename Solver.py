@@ -17,25 +17,25 @@ class Solver:
         """Checks the box the row and the column if the number is valid."""
 
         # Checks if the number exists in the same row.
-        for num_dict in self.grid[pos[0]]:
+        for col_num, num_dict in enumerate(self.grid[pos[0]]):
             if num_dict["value"] == num:
-                return False
+                return (pos[0], col_num)
 
         # Checks if a number exists in the same column.
         for col in range(9):
             if num == self.grid[col][pos[1]]["value"]:
-                return False
+                return (col, pos[1])
 
         # Checks if number exists in the 3x3 box of number.
         box_x_start = (pos[0] // 3) * 3
         box_y_start = (pos[1] // 3) * 3
 
-        for row in self.grid[box_x_start : box_x_start + 3]:
-            for col in row[box_y_start : box_y_start + 3]:
+        for row_num, row in enumerate(self.grid[box_x_start : box_x_start + 3]):
+            for col_num, col in enumerate(row[box_y_start : box_y_start + 3]):
                 if num == col["value"]:
-                    return False
+                    return (row_num, col_num)
 
-        return True
+        return False
 
     def find_empty(self):
         """Returns the row, col of next empty space."""
@@ -59,7 +59,7 @@ class Solver:
             row, col = empty_pos
 
         for num in range(1, 10):
-            if self.check_num(num, empty_pos):
+            if not self.check_num(num, empty_pos):
                 self.grid[row][col]["value"] = num
 
                 if self.solve_board():

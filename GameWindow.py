@@ -2,6 +2,7 @@ import pygame
 from PygameConfig import PygameConfig
 from SudokuGenerator import SudokuGenerator
 from Solver import Solver
+import time
 
 
 class GameWindow:
@@ -25,6 +26,8 @@ class GameWindow:
 
         self.is_solving = False
         self.is_solved = False
+        self.initial_time_check_num = 0
+        self.elapsed_time_check_box = 0
 
     def get_grid_dict(self):
         """Gets a 2d list containing dicts instead of just numbers."""
@@ -49,7 +52,8 @@ class GameWindow:
                     "value": self.SudokuGenerator.grid[row_num][col_num],
                     "can-change": self.SudokuGenerator.grid[row_num][col_num] == 0,
                     "rect": pygame.Rect(x, y, width, height),
-                    "color": (0, 0, 0),
+                    "border-color": (0, 0, 0),
+                    "bg-color": (255, 255, 255),
                 }
 
     def make_sudoku_mouse_responsive(self):
@@ -62,14 +66,14 @@ class GameWindow:
         for row_num, row in enumerate(self.SudokuGenerator.grid):
             for col_num, num_dict in enumerate(row):
                 if num_dict["rect"].collidepoint(mouse_x, mouse_y):
-                    self.SudokuGenerator.grid[row_num][col_num]["color"] = (0, 0, 255)
+                    self.SudokuGenerator.grid[row_num][col_num]["border-color"] = (0, 0, 255)
 
                     if pygame.mouse.get_pressed()[0] == 1:
                         self.selected_row = row_num
                         self.selected_col = col_num
                     
                 else:
-                    self.SudokuGenerator.grid[row_num][col_num]["color"] = (0, 0, 0)
+                    self.SudokuGenerator.grid[row_num][col_num]["border-color"] = (0, 0, 0)
 
     def draw_sudoku(self):
         """Draws the sudoku surface."""
@@ -79,8 +83,8 @@ class GameWindow:
         for row_num, row in enumerate(self.SudokuGenerator.grid):
             for col_num, num_dict in enumerate(row):
 
-                pygame.draw.rect(self.sudoku_surface, (255, 255, 255), num_dict["rect"])
-                pygame.draw.rect(self.sudoku_surface, num_dict["color"], num_dict["rect"], 1)
+                pygame.draw.rect(self.sudoku_surface, num_dict["bg-color"], num_dict["rect"])
+                pygame.draw.rect(self.sudoku_surface, num_dict["border-color"], num_dict["rect"], 1)
                 text = self.settings.write_center_text(
                     num_dict["value"],
                     num_dict["rect"],
@@ -229,6 +233,30 @@ class GameWindow:
 
         return False
     
+    def check_num(self, num, pos):
+        """Checks the box the row and the column if the number is valid."""
+
+        # Checks if the number exists in the same row.
+        for col_num, num_dict in enumerate(self.SudokuGenerator.grid[pos[0]]):
+            if num_dict["value"] == num and col_num != self.selected_col:
+                return (pos[0], col_num)
+
+        # Checks if a number exists in the same column.
+        for row in range(9):
+            if num == self.SudokuGenerator.grid[row][pos[1]]["value"] and row != self.selected_row:
+                return (row, pos[1])
+
+        # Checks if number exists in the 3x3 box of number.
+        box_x_start = (pos[0] // 3) * 3
+        box_y_start = (pos[1] // 3) * 3
+
+        for row_num, row in enumerate(self.SudokuGenerator.grid[box_x_start : box_x_start + 3]):
+            for col_num, col in enumerate(row[box_y_start : box_y_start + 3]):
+                if num == col["value"] and (row_num, col_num) != (self.selected_row, self.selected_col):
+                    return (self.SudokuGenerator.grid.index(row), row.index(col))
+
+        return False
+    
     def restore_grid(self):
         """Restores the grid."""
 
@@ -236,6 +264,13 @@ class GameWindow:
             for col_num, num_dict in enumerate(row):
                 if num_dict["can-change"]:
                     self.SudokuGenerator.grid[row_num][col_num]["value"] = 0
+
+    def clear_check_box_colors(self):
+        """Clears all the colors acquired by the check box button."""
+
+        for row_num, row in enumerate(self.SudokuGenerator.grid):
+            for col_num, num_dict in enumerate(row):
+                self.SudokuGenerator.grid[row_num][col_num]["bg-color"] = (255, 255, 255)
 
     def main(self):
         """Main loop of the lobby window."""
@@ -260,9 +295,34 @@ class GameWindow:
                 self.solve()
                 self.is_solved = True
                 self.is_solving = False
+            
+            if check_box_mouse_status["is-pressed"]:
+                same_num_pos = self.check_num(
+                    self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"],
+                    (self.selected_row, self.selected_col)
+                )
+
+                if same_num_pos and same_num_pos != (self.selected_row, self.selected_col):
+                    self.SudokuGenerator.grid[same_num_pos[0]][same_num_pos[1]]["bg-color"] = (255, 100, 100)
+                    self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (255, 100, 100)
+
+                
+                else:
+                    self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (100, 255, 100)
+                
+                self.initial_time_check_num = time.time()
 
             if not self.is_solved:
                 self.update_grid()
+            
+            if self.initial_time_check_num != 0:
+                self.elapsed_time_check_box = time.time() - self.initial_time_check_num
+
+            if self.elapsed_time_check_box >= 5:
+                self.clear_check_box_colors()
+                self.initial_time_check_num = 0
+                self.elapsed_time_check_box = 0
+
 
             self.draw_window()
             pygame.display.update()
