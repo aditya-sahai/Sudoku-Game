@@ -47,13 +47,19 @@ class GameWindow:
                 if col_num % 3 == 0 and col_num != 0:
                     x += self.settings.BOX_LINES_THICKNESS
                     width -= self.settings.BOX_LINES_THICKNESS
+                
+                if self.SudokuGenerator.grid[row_num][col_num] == 0:
+                    bg_color = self.settings.CHANGABLE_BOX_BG_COLOR
+                
+                else:
+                    bg_color = self.settings.UNCHANGABLE_BOX_BG_COLOR
 
                 self.SudokuGenerator.grid[row_num][col_num] = {
                     "value": self.SudokuGenerator.grid[row_num][col_num],
                     "can-change": self.SudokuGenerator.grid[row_num][col_num] == 0,
                     "rect": pygame.Rect(x, y, width, height),
                     "border-color": (0, 0, 0),
-                    "bg-color": (255, 255, 255),
+                    "bg-color": bg_color,
                 }
 
     def make_sudoku_mouse_responsive(self):
@@ -216,7 +222,7 @@ class GameWindow:
             row, col = empty_pos
 
         for num in range(1, 10):
-            if self.Solver.check_num(num, empty_pos):
+            if not self.Solver.check_num(num, empty_pos):
                 self.SudokuGenerator.grid[row][col]["value"] = num
                 self.selected_row = row
                 self.selected_col = col
@@ -270,7 +276,11 @@ class GameWindow:
 
         for row_num, row in enumerate(self.SudokuGenerator.grid):
             for col_num, num_dict in enumerate(row):
-                self.SudokuGenerator.grid[row_num][col_num]["bg-color"] = (255, 255, 255)
+                if num_dict["can-change"]:
+                    self.SudokuGenerator.grid[row_num][col_num]["bg-color"] = self.settings.CHANGABLE_BOX_BG_COLOR
+
+                else:
+                    self.SudokuGenerator.grid[row_num][col_num]["bg-color"] = self.settings.UNCHANGABLE_BOX_BG_COLOR
 
     def main(self):
         """Main loop of the lobby window."""
@@ -296,7 +306,7 @@ class GameWindow:
                 self.is_solved = True
                 self.is_solving = False
             
-            if check_box_mouse_status["is-pressed"]:
+            if check_box_mouse_status["is-pressed"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"] != 0:
                 same_num_pos = self.check_num(
                     self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"],
                     (self.selected_row, self.selected_col)
@@ -306,7 +316,6 @@ class GameWindow:
                     self.SudokuGenerator.grid[same_num_pos[0]][same_num_pos[1]]["bg-color"] = (255, 100, 100)
                     self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (255, 100, 100)
 
-                
                 else:
                     self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (100, 255, 100)
                 
