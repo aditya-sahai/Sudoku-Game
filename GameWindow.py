@@ -167,12 +167,15 @@ class GameWindow:
         self.pressed_key = None
 
         for event in pygame.event.get():
+
+            pressed = pygame.key.get_pressed()
+            self.shift_held = pressed[pygame.K_LSHIFT] or pressed[pygame.K_RSHIFT]
+
             if event.type == pygame.QUIT:
-                # self.loop_running = False
                 pygame.quit()
                 exit()
-            
-            elif event.type == pygame.KEYDOWN:
+
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE or event.key == pygame.K_BACKSPACE:
                     self.pressed_key = 0
                 elif event.key == pygame.K_1 or event.key == pygame.K_KP1:
@@ -258,7 +261,7 @@ class GameWindow:
 
         for row_num, row in enumerate(self.SudokuGenerator.grid[box_x_start : box_x_start + 3]):
             for col_num, col in enumerate(row[box_y_start : box_y_start + 3]):
-                if num == col["value"] and (row_num, col_num) != (self.selected_row, self.selected_col):
+                if num == col["value"] and (self.SudokuGenerator.grid.index(row), row.index(col)) != (self.selected_row, self.selected_col):
                     return (self.SudokuGenerator.grid.index(row), row.index(col))
 
         return False
@@ -307,6 +310,7 @@ class GameWindow:
                 self.is_solving = False
             
             if check_box_mouse_status["is-pressed"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"] != 0:
+                # time.sleep(1)
                 same_num_pos = self.check_num(
                     self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"],
                     (self.selected_row, self.selected_col)
