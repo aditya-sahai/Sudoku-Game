@@ -88,7 +88,8 @@ class PygameConfig:
         self.SUBMIT_BOX_COLOR = (75, 255, 75)
 
         self.BUTTON_FONT = pygame.font.Font("Fonts/Howkins.ttf", 50)
-        
+        self.TIME_FONT = pygame.font.Font("Fonts/CourierPrime.ttf", 35)
+
         self.CHANGABLE_BOX_BG_COLOR = (255, 255, 255)
         self.UNCHANGABLE_BOX_BG_COLOR = (235, 235, 235)
     

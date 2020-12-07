@@ -29,6 +29,9 @@ class GameWindow:
         self.initial_time_check_num = 0
         self.elapsed_time_check_box = 0
 
+        self.sudoku_start_time = time.time()
+        self.elapsed_time = round(time.time() - self.sudoku_start_time, 2)
+
     def get_grid_dict(self):
         """Gets a 2d list containing dicts instead of just numbers."""
 
@@ -107,8 +110,10 @@ class GameWindow:
         """Draws the time button, solve button and check box button."""
 
         pygame.draw.rect(self.settings.win, color, rect)
+        font = self.settings.BUTTON_FONT
 
         if rect == self.settings.TIME_BOX_RECT:
+            font = self.settings.TIME_FONT
             pygame.draw.rect(
                 self.settings.win,
                 (250, 250, 250),
@@ -119,7 +124,7 @@ class GameWindow:
             str(text).strip(),
             rect,
             (0, 0, 0),
-            self.settings.BUTTON_FONT
+            font
         )
         self.settings.win.blit(box_text["text"], box_text["rect"])
     
@@ -144,6 +149,8 @@ class GameWindow:
         """Draws the game window."""
 
         self.settings.win.fill(self.settings.BACKGROUND_COLOR)
+        self.elapsed_time = str(round(time.time() - self.sudoku_start_time, 1))
+        self.elapsed_time = f"{self.elapsed_time}{'0' * (1 - len(self.elapsed_time.split('.')[1]))}"
         
         self.draw_sudoku()
         self.settings.win.blit(self.sudoku_surface, (self.settings.SUDOKU_X, self.settings.SUDOKU_Y))
@@ -156,7 +163,7 @@ class GameWindow:
         )
         self.settings.win.blit(text["text"], text["rect"])
         
-        self.draw_utility_box(self.settings.TIME_BOX_RECT, self.settings.TIME_BOX_COLOR, "Time")
+        self.draw_utility_box(self.settings.TIME_BOX_RECT, self.settings.TIME_BOX_COLOR, str(self.elapsed_time))
         self.draw_utility_box(self.settings.SOLVE_BOX_RECT, self.settings.SOLVE_BOX_COLOR, "Solve")
         self.draw_utility_box(self.settings.CHECK_BOX_RECT, self.settings.CHECK_BOX_COLOR, "Check Box")
         self.draw_utility_box(self.settings.SUBMIT_BOX_RECT, self.settings.SUBMIT_BOX_COLOR, "Submit")
