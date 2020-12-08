@@ -149,8 +149,10 @@ class GameWindow:
         """Draws the game window."""
 
         self.settings.win.fill(self.settings.BACKGROUND_COLOR)
-        self.elapsed_time = str(round(time.time() - self.sudoku_start_time, 1))
-        self.elapsed_time = f"{self.elapsed_time}{'0' * (1 - len(self.elapsed_time.split('.')[1]))}"
+        
+        if not self.is_solving:
+            self.elapsed_time = str(round(time.time() - self.sudoku_start_time, 1))
+            self.elapsed_time = f"{self.elapsed_time}{'0' * (1 - len(self.elapsed_time.split('.')[1]))}"
         
         self.draw_sudoku()
         self.settings.win.blit(self.sudoku_surface, (self.settings.SUDOKU_X, self.settings.SUDOKU_Y))
@@ -203,6 +205,26 @@ class GameWindow:
                     self.pressed_key = 8
                 elif event.key == pygame.K_9 or event.key == pygame.K_KP9:
                     self.pressed_key = 9
+                elif event.key == pygame.K_UP:
+                    if self.selected_row == 0:
+                        self.selected_row = 8
+                    else:
+                        self.selected_row -= 1
+                elif event.key == pygame.K_DOWN:
+                    if self.selected_row == 8:
+                        self.selected_row = 0
+                    else:
+                        self.selected_row += 1
+                elif event.key == pygame.K_LEFT:
+                    if self.selected_col == 0:
+                        self.selected_col = 8
+                    else:
+                        self.selected_col -= 1
+                elif event.key == pygame.K_RIGHT:
+                    if self.selected_col == 8:
+                        self.selected_col = 0
+                    else:
+                        self.selected_col += 1
 
     def update_grid(self):
         """Updates the grid when the user enters a number."""
@@ -255,11 +277,13 @@ class GameWindow:
         # Checks if the number exists in the same row.
         for col_num, num_dict in enumerate(self.SudokuGenerator.grid[pos[0]]):
             if num_dict["value"] == num and col_num != self.selected_col:
+                # print("SAME ROW")
                 return (pos[0], col_num)
 
         # Checks if a number exists in the same column.
         for row in range(9):
             if num == self.SudokuGenerator.grid[row][pos[1]]["value"] and row != self.selected_row:
+                # print("SAME COL")
                 return (row, pos[1])
 
         # Checks if number exists in the 3x3 box of number.
@@ -269,9 +293,23 @@ class GameWindow:
         for row_num, row in enumerate(self.SudokuGenerator.grid[box_x_start : box_x_start + 3]):
             for col_num, col in enumerate(row[box_y_start : box_y_start + 3]):
                 if num == col["value"] and (self.SudokuGenerator.grid.index(row), row.index(col)) != (self.selected_row, self.selected_col):
+                    # print("SAME BOX")
                     return (self.SudokuGenerator.grid.index(row), row.index(col))
 
         return False
+    
+    def check_submitted_sudoku(self):
+        """Checks the sudoku. Is called on clicking submit button."""
+
+        for row_num, row in enumerate(self.SudokuGenerator.grid):
+            for col_num, col in enumerate(row):
+
+                self.selected_row, self.selected_col = (row_num, col_num)
+                
+                if not self.check_box_change_colors():
+                    return False
+        
+        return True
     
     def restore_grid(self):
         """Restores the grid."""
@@ -280,6 +318,29 @@ class GameWindow:
             for col_num, num_dict in enumerate(row):
                 if num_dict["can-change"]:
                     self.SudokuGenerator.grid[row_num][col_num]["value"] = 0
+
+    def check_box_change_colors(self):
+        """Checks if the num at the selected row and col is valid and changes colors accordingly."""
+
+        same_num_pos = self.check_num(
+            self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"],
+            (self.selected_row, self.selected_col)
+        )
+
+        if same_num_pos and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"] != 0:
+            self.SudokuGenerator.grid[same_num_pos[0]][same_num_pos[1]]["bg-color"] = (255, 100, 100)
+            self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (255, 100, 100)
+            valid = False
+        
+        elif self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"] == 0:
+            self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (255, 100, 100)
+            valid = False
+        else:
+            self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (100, 255, 100)
+            valid = True
+        
+        self.initial_time_check_num = time.time()
+        return valid
 
     def clear_check_box_colors(self):
         """Clears all the colors acquired by the check box button."""
@@ -316,21 +377,11 @@ class GameWindow:
                 self.is_solved = True
                 self.is_solving = False
             
-            if check_box_mouse_status["is-pressed"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"] != 0:
-                # time.sleep(1)
-                same_num_pos = self.check_num(
-                    self.SudokuGenerator.grid[self.selected_row][self.selected_col]["value"],
-                    (self.selected_row, self.selected_col)
-                )
+            if check_box_mouse_status["is-pressed"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"]:
+                self.check_box_change_colors()
 
-                if same_num_pos and same_num_pos != (self.selected_row, self.selected_col):
-                    self.SudokuGenerator.grid[same_num_pos[0]][same_num_pos[1]]["bg-color"] = (255, 100, 100)
-                    self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (255, 100, 100)
-
-                else:
-                    self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (100, 255, 100)
-                
-                self.initial_time_check_num = time.time()
+            if submit_mouse_status["is-pressed"]:
+                solved_status = self.check_submitted_sudoku()
 
             if not self.is_solved:
                 self.update_grid()
