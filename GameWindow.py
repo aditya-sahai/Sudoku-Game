@@ -165,7 +165,7 @@ class GameWindow:
             is_hovering = True
 
         return {
-            "is-pressed": mouse_is_pressed and not self.is_solving and is_hovering,
+            "is-pressed": mouse_is_pressed and is_hovering,
             "color": color,
         }
 
@@ -173,14 +173,6 @@ class GameWindow:
         """Draws the game window."""
 
         self.settings.win.fill(self.settings.BACKGROUND_COLOR)
-
-        if not self.is_solving:
-            self.elapsed_time = round(time.time() - self.sudoku_start_time)
-            self.elapsed_minutes = str(int(self.elapsed_time // 60))
-            self.elapsed_minutes = f"{'0' * (2 - len(self.elapsed_minutes))}{self.elapsed_minutes}"
-
-            self.elapsed_seconds = str(self.elapsed_time - (int(self.elapsed_minutes) * 60))
-            self.elapsed_seconds = f"{'0' * (2 - len(self.elapsed_seconds))}{self.elapsed_seconds}"
 
         self.draw_sudoku()
         self.settings.win.blit(self.sudoku_surface, (self.settings.SUDOKU_X, self.settings.SUDOKU_Y))
@@ -196,7 +188,14 @@ class GameWindow:
         self.draw_utility_box(self.settings.TIME_BOX_RECT, self.settings.TIME_BOX_COLOR, str(self.elapsed_time))
         self.draw_utility_box(self.settings.SOLVE_BOX_RECT, self.settings.SOLVE_BOX_COLOR, "Solve")
         self.draw_utility_box(self.settings.CHECK_BOX_RECT, self.settings.CHECK_BOX_COLOR, "Check Box")
-        self.draw_utility_box(self.settings.SUBMIT_BOX_RECT, self.settings.SUBMIT_BOX_COLOR, "Submit")
+
+        if not self.is_solved:
+            submit_button_text = "Submit"
+
+        else:
+            submit_button_text = "Proceed"
+
+        self.draw_utility_box(self.settings.SUBMIT_BOX_RECT, self.settings.SUBMIT_BOX_COLOR, submit_button_text)
 
     def event_loop(self):
         """The event loop for events like closing he window."""
@@ -391,6 +390,14 @@ class GameWindow:
             self.event_loop()
             self.make_sudoku_mouse_responsive()
 
+            if not self.is_solving and not self.is_solved:
+                self.elapsed_time = round(time.time() - self.sudoku_start_time)
+                self.elapsed_minutes = str(int(self.elapsed_time // 60))
+                self.elapsed_minutes = f"{'0' * (2 - len(self.elapsed_minutes))}{self.elapsed_minutes}"
+
+                self.elapsed_seconds = str(self.elapsed_time - (int(self.elapsed_minutes) * 60))
+                self.elapsed_seconds = f"{'0' * (2 - len(self.elapsed_seconds))}{self.elapsed_seconds}"
+
             solve_mouse_status = self.make_buttons_responsive(self.settings.SOLVE_BOX_RECT)
             check_box_mouse_status = self.make_buttons_responsive(self.settings.CHECK_BOX_RECT)
             submit_mouse_status = self.make_buttons_responsive(self.settings.SUBMIT_BOX_RECT)
@@ -405,13 +412,26 @@ class GameWindow:
                 self.restore_grid()
                 self.solve()
                 self.is_solved = True
+                self.computer_solved = True
                 self.is_solving = False
+
+            elif submit_mouse_status["is-pressed"] and self.is_solved:
+
+                # pygame.quit()
+
+                return {
+                    "computer-solved": self.computer_solved,
+                    "secs": self.elapsed_seconds,
+                    "mins": self.elapsed_minutes,
+                }
 
             if check_box_mouse_status["is-pressed"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"]:
                 self.check_box_change_colors()
 
             if submit_mouse_status["is-pressed"]:
                 solved_status = self.check_submitted_sudoku()
+                if solved_status:
+                    self.computer_solved = False
 
             if not self.is_solved:
                 self.update_grid()
@@ -435,4 +455,5 @@ if __name__ == "__main__":
     settings = PygameConfig()
 
     Game = GameWindow("medium", settings)
-    Game.main()
+    game_data = Game.main()
+    # print(game_data)
