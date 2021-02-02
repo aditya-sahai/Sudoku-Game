@@ -9,7 +9,7 @@ class PygameConfig:
         self.HEIGHT = 700
         self.win = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         pygame.display.set_caption("Sudoku Masters")
-        
+
         self.FPS = 30
         self.clock = pygame.time.Clock()
 
@@ -88,11 +88,11 @@ class PygameConfig:
         self.SUBMIT_BOX_COLOR = (75, 255, 75)
 
         self.BUTTON_FONT = pygame.font.Font("Fonts/Howkins.ttf", 50)
-        self.TIME_FONT = pygame.font.Font("Fonts/CourierPrime.ttf", 35)
+        self.TIME_FONT = pygame.font.Font("Fonts/CourierPrime.ttf", 27)
 
         self.CHANGABLE_BOX_BG_COLOR = (255, 255, 255)
         self.UNCHANGABLE_BOX_BG_COLOR = (235, 235, 235)
-    
+
     def write_center_text(self, text, rect, color, font):
         """Writes the given text at the center of the given rect"""
 
@@ -108,4 +108,3 @@ class PygameConfig:
 
 if __name__ == "__main__":
     Config = PygameConfig()
-    
