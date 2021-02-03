@@ -5,6 +5,7 @@ pygame.init()
 
 class PygameConfig:
     def __init__(self):
+        # ------------------------------------------------------- General Config
         self.WIDTH = 800
         self.HEIGHT = 700
         self.win = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
@@ -20,7 +21,10 @@ class PygameConfig:
         self.SUDOKU_Y = self.HEIGHT - self.BLOCK_SIZE - self.SUDOKU_HEIGHT
 
         self.BACKGROUND_COLOR = (200, 200, 200)
-        # self.SUDOKU_NUMBER_FONT = pygame.font.SysFont("comicsansms", 36)
+        # --------------------------------------------- General Config Ends Here
+
+
+        # --------------------------------------------------- Game Window Config
         self.SUDOKU_NUMBER_FONT = pygame.font.Font("Fonts/Howkins.ttf", 50)
 
         self.BOX_LINES_THICKNESS = 2
@@ -92,6 +96,58 @@ class PygameConfig:
 
         self.CHANGABLE_BOX_BG_COLOR = (255, 255, 255)
         self.UNCHANGABLE_BOX_BG_COLOR = (235, 235, 235)
+        # ----------------------------------------- Game Window Config Ends Here
+
+
+        # -------------------------------------------------- Lobby Window Config
+        self.LOBBY_WINDOW_HEADING_X = self.BLOCK_SIZE
+        self.LOBBY_WINDOW_HEADING_Y = self.BLOCK_SIZE * 2
+        self.LOBBY_WINDOW_HEADING_WIDTH = self.SUDOKU_WIDTH * 1.5
+        self.LOBBY_WINDOW_HEADING_HEIGHT = self.SUDOKU_Y - self.GAME_WINDOW_HEADING_Y - self.BLOCK_SIZE
+        self.LOBBY_WINDOW_HEADING_RECT = pygame.Rect(
+             self.LOBBY_WINDOW_HEADING_X,
+             self.LOBBY_WINDOW_HEADING_Y,
+             self.LOBBY_WINDOW_HEADING_WIDTH,
+             self.LOBBY_WINDOW_HEADING_HEIGHT
+        )
+
+        self.DIFFICULTY_BOX_X = self.LOBBY_WINDOW_HEADING_X + 2 * self.BLOCK_SIZE
+        self.DIFFICULTY_BOX_Y = self.LOBBY_WINDOW_HEADING_Y + self.LOBBY_WINDOW_HEADING_HEIGHT + 1.5 * self.BLOCK_SIZE
+        self.DIFFICULTY_BOX_WIDTH = self.LOBBY_WINDOW_HEADING_WIDTH - 4 * self.BLOCK_SIZE
+        self.DIFFICULTY_BOX_HEIGHT = 2 * self.BLOCK_SIZE
+        self.DIFFICULTY_BOX_RECT = pygame.Rect(
+             self.DIFFICULTY_BOX_X,
+             self.DIFFICULTY_BOX_Y,
+             self.DIFFICULTY_BOX_WIDTH,
+             self.DIFFICULTY_BOX_HEIGHT
+        )
+
+        self.PLAY_BOX_X = self.LOBBY_WINDOW_HEADING_X + 2 * self.BLOCK_SIZE
+        self.PLAY_BOX_Y = self.DIFFICULTY_BOX_Y + self.DIFFICULTY_BOX_HEIGHT + 1.5 * self.BLOCK_SIZE
+        self.PLAY_BOX_WIDTH = self.LOBBY_WINDOW_HEADING_WIDTH - 4 * self.BLOCK_SIZE
+        self.PLAY_BOX_HEIGHT = 2 * self.BLOCK_SIZE
+        self.PLAY_BOX_RECT = pygame.Rect(
+             self.PLAY_BOX_X,
+             self.PLAY_BOX_Y,
+             self.PLAY_BOX_WIDTH,
+             self.PLAY_BOX_HEIGHT
+        )
+
+        self.LOBBY_WINDOW_BOXES_COLOR = (255, 255, 0)
+
+        self.LOBBY_WINDOW_DIFFICULTY_CHANGE_ARROW = pygame.image.load("Images\\up-arrow.jpg")
+        self.LOBBY_WINDOW_RIGHT_ARROW = pygame.transform.rotate(self.LOBBY_WINDOW_DIFFICULTY_CHANGE_ARROW, 270)
+        self.LOBBY_WINDOW_LEFT_ARROW = pygame.transform.rotate(self.LOBBY_WINDOW_DIFFICULTY_CHANGE_ARROW, 90)
+
+        self.ARROWS_Y = int(self.DIFFICULTY_BOX_Y + 0.5 * self.BLOCK_SIZE)
+        self.LEFT_ARROW_X = int(self.DIFFICULTY_BOX_X + 0.5 * self.BLOCK_SIZE)
+        self.RIGHT_ARROW_X = int(self.DIFFICULTY_BOX_X + self.DIFFICULTY_BOX_WIDTH - (self.BLOCK_SIZE + self.BLOCK_SIZE * 0.5))
+
+        # print(f"Left Arrow: {self.LEFT_ARROW_X} {self.ARROWS_Y}")
+        # print(f"Right Arrow: {self.RIGHT_ARROW_X} {self.ARROWS_Y}")
+
+        self.LOBBY_WINDOW_FONT = pygame.font.Font("Fonts/Howkins.ttf", 75)
+        # ---------------------------------------- Lobby Window Config Ends Here
 
     def write_center_text(self, text, rect, color, font):
         """Writes the given text at the center of the given rect"""
