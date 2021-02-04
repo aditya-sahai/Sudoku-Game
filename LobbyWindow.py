@@ -87,8 +87,21 @@ class LobbyWindow:
         self.settings.win.blit(play_text["text"], play_text["rect"])
         self.settings.win.blit(difficulty_text["text"], difficulty_text["rect"])
 
-        self.settings.win.blit(self.settings.LOBBY_WINDOW_LEFT_ARROW, (self.settings.LEFT_ARROW_X, self.settings.ARROWS_Y))
-        self.settings.win.blit(self.settings.LOBBY_WINDOW_RIGHT_ARROW, (self.settings.RIGHT_ARROW_X, self.settings.ARROWS_Y))
+        # self.settings.win.blit(self.settings.LOBBY_WINDOW_RIGHT_ARROW, (self.settings.RIGHT_ARROW_X, self.settings.ARROWS_Y))
+
+        if self.left_arrow_is_pressed:
+            self.settings.win.blit(self.settings.REDUCED_LOBBY_WINDOW_LEFT_ARROW, (self.settings.LEFT_ARROW_X + self.settings.SIZE_DECREASE_PERCENT / 4, self.settings.ARROWS_Y + self.settings.SIZE_DECREASE_PERCENT / 4))
+        elif self.left_arrow_hovering:
+            self.settings.win.blit(self.settings.ENLARGED_LOBBY_WINDOW_LEFT_ARROW, (self.settings.LEFT_ARROW_X - self.settings.SIZE_INCREASE_PERCENT / 4, self.settings.ARROWS_Y - self.settings.SIZE_INCREASE_PERCENT / 4))
+        else:
+            self.settings.win.blit(self.settings.LOBBY_WINDOW_LEFT_ARROW, (self.settings.LEFT_ARROW_X, self.settings.ARROWS_Y))
+
+        if self.right_arrow_is_pressed:
+            self.settings.win.blit(self.settings.REDUCED_LOBBY_WINDOW_RIGHT_ARROW, (self.settings.RIGHT_ARROW_X + self.settings.SIZE_DECREASE_PERCENT / 4, self.settings.ARROWS_Y + self.settings.SIZE_DECREASE_PERCENT / 4))
+        elif self.right_arrow_hovering:
+            self.settings.win.blit(self.settings.ENLARGED_LOBBY_WINDOW_RIGHT_ARROW, (self.settings.RIGHT_ARROW_X - self.settings.SIZE_INCREASE_PERCENT / 4, self.settings.ARROWS_Y - self.settings.SIZE_INCREASE_PERCENT / 4))
+        else:
+            self.settings.win.blit(self.settings.LOBBY_WINDOW_RIGHT_ARROW, (self.settings.RIGHT_ARROW_X, self.settings.ARROWS_Y))
 
         self.settings.win.blit(toggle_show_solve_text["text"], toggle_show_solve_text["rect"])
         pygame.draw.rect(self.settings.win, self.toggle_box_color, self.settings.TOGGLE_SHOW_SOLVE_BUTTON_RECT)
@@ -119,6 +132,18 @@ class LobbyWindow:
             right_arrow_mouse_status = self.settings.make_buttons_responsive(pygame.Rect(self.settings.RIGHT_ARROW_X, self.settings.ARROWS_Y, self.settings.BLOCK_SIZE, self.settings.BLOCK_SIZE), None)
 
             self.play_box_color = play_mouse_status["color"]
+            self.left_arrow_is_pressed = left_arrow_mouse_status["is-pressed"]
+            self.right_arrow_is_pressed = right_arrow_mouse_status["is-pressed"]
+
+            if left_arrow_mouse_status["hovering"]:
+                self.left_arrow_hovering = True
+            else:
+                self.left_arrow_hovering = False
+
+            if right_arrow_mouse_status["hovering"]:
+                self.right_arrow_hovering = True
+            else:
+                self.right_arrow_hovering = False
 
             if left_arrow_mouse_status["is-pressed"] and self.left_arrow_counter >= 4:
                 if self.selected_difficulty_num != 0:

@@ -180,6 +180,14 @@ class PygameConfig:
         self.LOBBY_WINDOW_RIGHT_ARROW = pygame.transform.rotate(self.LOBBY_WINDOW_DIFFICULTY_CHANGE_ARROW, 270)
         self.LOBBY_WINDOW_LEFT_ARROW = pygame.transform.rotate(self.LOBBY_WINDOW_DIFFICULTY_CHANGE_ARROW, 90)
 
+        self.SIZE_INCREASE_PERCENT = 5
+        self.ENLARGED_LOBBY_WINDOW_RIGHT_ARROW = pygame.transform.rotozoom(self.LOBBY_WINDOW_RIGHT_ARROW, 0, 1 + self.SIZE_INCREASE_PERCENT / 100)
+        self.ENLARGED_LOBBY_WINDOW_LEFT_ARROW = pygame.transform.rotozoom(self.LOBBY_WINDOW_LEFT_ARROW, 0, 1 + self.SIZE_INCREASE_PERCENT / 100)
+
+        self.SIZE_DECREASE_PERCENT = 5
+        self.REDUCED_LOBBY_WINDOW_RIGHT_ARROW = pygame.transform.rotozoom(self.LOBBY_WINDOW_RIGHT_ARROW, 0, 1 - self.SIZE_DECREASE_PERCENT / 100)
+        self.REDUCED_LOBBY_WINDOW_LEFT_ARROW = pygame.transform.rotozoom(self.LOBBY_WINDOW_LEFT_ARROW, 0, 1 - self.SIZE_DECREASE_PERCENT / 100)
+
         self.ARROWS_Y = int(self.DIFFICULTY_BOX_Y + 0.5 * self.BLOCK_SIZE)
         self.LEFT_ARROW_X = int(self.DIFFICULTY_BOX_X + 0.5 * self.BLOCK_SIZE)
         self.RIGHT_ARROW_X = int(self.DIFFICULTY_BOX_X + self.DIFFICULTY_BOX_WIDTH - (self.BLOCK_SIZE + self.BLOCK_SIZE * 0.5))
@@ -222,6 +230,7 @@ class PygameConfig:
 
         return {
             "is-pressed": mouse_is_pressed and is_hovering,
+            "hovering": is_hovering,
             "color": color,
         }
 
