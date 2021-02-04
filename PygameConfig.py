@@ -21,6 +21,8 @@ class PygameConfig:
         self.SUDOKU_Y = self.HEIGHT - self.BLOCK_SIZE - self.SUDOKU_HEIGHT
 
         self.BACKGROUND_COLOR = (200, 200, 200)
+        self.BUTTON_HOVERING_COLOR = (255, 100, 100)
+        self.BUTTON_CLICK_COLOR = (255, 75, 75)
         # --------------------------------------------- General Config Ends Here
 
 
@@ -132,8 +134,47 @@ class PygameConfig:
              self.PLAY_BOX_WIDTH,
              self.PLAY_BOX_HEIGHT
         )
+        self.PLAY_BOX_COLOR = (255, 255, 75)
 
-        self.LOBBY_WINDOW_BOXES_COLOR = (255, 255, 0)
+        self.TOGGLE_SHOW_SOLVE_BOX_X = self.PLAY_BOX_RECT.center[0] - 4 * self.BLOCK_SIZE
+        self.TOGGLE_SHOW_SOLVE_BOX_Y = self.PLAY_BOX_Y + self.PLAY_BOX_HEIGHT + 1 * self.BLOCK_SIZE
+        self.TOGGLE_SHOW_SOLVE_BOX_WIDTH = 6 * self.BLOCK_SIZE
+        self.TOGGLE_SHOW_SOLVE_BOX_HEIGHT = self.BLOCK_SIZE
+        self.TOGGLE_SHOW_SOLVE_BOX_RECT = pygame.Rect(
+             self.TOGGLE_SHOW_SOLVE_BOX_X,
+             self.TOGGLE_SHOW_SOLVE_BOX_Y,
+             self.TOGGLE_SHOW_SOLVE_BOX_WIDTH,
+             self.TOGGLE_SHOW_SOLVE_BOX_HEIGHT
+        )
+
+        self.TOGGLE_SHOW_SOLVE_BUTTON_X = int(self.TOGGLE_SHOW_SOLVE_BOX_X + self.TOGGLE_SHOW_SOLVE_BOX_WIDTH + 0.5 * self.BLOCK_SIZE)
+        self.TOGGLE_SHOW_SOLVE_BUTTON_Y = self.PLAY_BOX_Y + self.PLAY_BOX_HEIGHT + 1 * self.BLOCK_SIZE
+        self.TOGGLE_SHOW_SOLVE_BUTTON_WIDTH = self.BLOCK_SIZE
+        self.TOGGLE_SHOW_SOLVE_BUTTON_HEIGHT = self.BLOCK_SIZE
+        self.TOGGLE_SHOW_SOLVE_BUTTON_RECT = pygame.Rect(
+             self.TOGGLE_SHOW_SOLVE_BUTTON_X,
+             self.TOGGLE_SHOW_SOLVE_BUTTON_Y,
+             self.TOGGLE_SHOW_SOLVE_BUTTON_WIDTH,
+             self.TOGGLE_SHOW_SOLVE_BUTTON_HEIGHT
+        )
+
+        self.HELP_CIRCLE_X = self.BLOCK_SIZE
+        self.HELP_CIRCLE_Y = self.HEIGHT - self.BLOCK_SIZE
+        self.HELP_CIRCLE_RADIUS = int(self.BLOCK_SIZE * 0.75)
+        self.HELP_CIRCLE_RECT = pygame.Rect(
+             self.HELP_CIRCLE_X - self.HELP_CIRCLE_RADIUS,
+             self.HELP_CIRCLE_Y - self.HELP_CIRCLE_RADIUS,
+             self.HELP_CIRCLE_RADIUS * 2,
+             self.HELP_CIRCLE_RADIUS * 2
+        )
+
+        self.LOBBY_WINDOW_BOXES_COLOR = (255, 255, 75)
+        self.SHOW_SOLVE_BUTTON_COLOR = (75, 255, 75)
+        self.SHOW_SOLVE_OFF_BUTTON_COLOR = (255, 75, 75)
+
+        self.HELP_CIRCLE_COLOR = (125, 125, 255)
+        self.HELP_HOVERING_CIRCLE_COLOR = (100, 100, 255)
+        self.HELP_CLICK_CIRCLE_COLOR = (90, 90, 255)
 
         self.LOBBY_WINDOW_DIFFICULTY_CHANGE_ARROW = pygame.image.load("Images\\up-arrow.jpg")
         self.LOBBY_WINDOW_RIGHT_ARROW = pygame.transform.rotate(self.LOBBY_WINDOW_DIFFICULTY_CHANGE_ARROW, 270)
@@ -147,6 +188,7 @@ class PygameConfig:
         # print(f"Right Arrow: {self.RIGHT_ARROW_X} {self.ARROWS_Y}")
 
         self.LOBBY_WINDOW_FONT = pygame.font.Font("Fonts/Howkins.ttf", 75)
+        self.TOGGLE_SHOW_SOLVE_FONT = pygame.font.Font("Fonts/Howkins.ttf", 50)
         # ---------------------------------------- Lobby Window Config Ends Here
 
     def write_center_text(self, text, rect, color, font):
@@ -159,6 +201,28 @@ class PygameConfig:
         return {
             "text": rendered_text,
             "rect": text_rect,
+        }
+
+    def make_buttons_responsive(self, rect, base_color):
+        """Change the color pf the buttons when hovered over and makes them functional."""
+
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_is_pressed = pygame.mouse.get_pressed()[0] == 1
+        color = base_color
+        is_hovering = False
+
+        if rect.collidepoint(mouse_pos):
+            color = self.BUTTON_HOVERING_COLOR
+            is_hovering = True
+            if mouse_is_pressed:
+                color = self.BUTTON_CLICK_COLOR
+
+        else:
+            color = base_color
+
+        return {
+            "is-pressed": mouse_is_pressed and is_hovering,
+            "color": color,
         }
 
 

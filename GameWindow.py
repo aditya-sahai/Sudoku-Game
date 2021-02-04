@@ -152,23 +152,6 @@ class GameWindow:
 
         self.settings.win.blit(box_text["text"], box_text["rect"])
 
-    def make_buttons_responsive(self, rect):
-        """Change the color pf the buttons when hovered over and makes them functional."""
-
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_is_pressed = pygame.mouse.get_pressed()[0] == 1
-        color = (75, 255, 75)
-        is_hovering = False
-
-        if rect.collidepoint(mouse_pos):
-            color = (255, 0, 0)
-            is_hovering = True
-
-        return {
-            "is-pressed": mouse_is_pressed and is_hovering,
-            "color": color,
-        }
-
     def draw_window(self):
         """Draws the game window."""
 
@@ -186,8 +169,8 @@ class GameWindow:
         self.settings.win.blit(text["text"], text["rect"])
 
         self.draw_utility_box(self.settings.TIME_BOX_RECT, self.settings.TIME_BOX_COLOR, str(self.elapsed_time))
-        self.draw_utility_box(self.settings.SOLVE_BOX_RECT, self.settings.SOLVE_BOX_COLOR, "Solve")
-        self.draw_utility_box(self.settings.CHECK_BOX_RECT, self.settings.CHECK_BOX_COLOR, "Check Box")
+        self.draw_utility_box(self.settings.SOLVE_BOX_RECT, self.solve_box_color, "Solve")
+        self.draw_utility_box(self.settings.CHECK_BOX_RECT, self.check_box_color, "Check Box")
 
         if not self.is_solved:
             submit_button_text = "Submit"
@@ -195,7 +178,7 @@ class GameWindow:
         else:
             submit_button_text = "Proceed"
 
-        self.draw_utility_box(self.settings.SUBMIT_BOX_RECT, self.settings.SUBMIT_BOX_COLOR, submit_button_text)
+        self.draw_utility_box(self.settings.SUBMIT_BOX_RECT, self.submit_box_color, submit_button_text)
 
     def event_loop(self):
         """The event loop for events like closing he window."""
@@ -263,13 +246,13 @@ class GameWindow:
     def solve(self):
         """Solves the board."""
 
-        solve_mouse_status = self.make_buttons_responsive(self.settings.SOLVE_BOX_RECT)
-        check_box_mouse_status = self.make_buttons_responsive(self.settings.CHECK_BOX_RECT)
-        submit_mouse_status = self.make_buttons_responsive(self.settings.SUBMIT_BOX_RECT)
+        solve_mouse_status = self.settings.make_buttons_responsive(self.settings.SOLVE_BOX_RECT, self.settings.SOLVE_BOX_COLOR)
+        check_box_mouse_status = self.settings.make_buttons_responsive(self.settings.CHECK_BOX_RECT, self.settings.CHECK_BOX_COLOR)
+        submit_mouse_status = self.settings.make_buttons_responsive(self.settings.SUBMIT_BOX_RECT, self.settings.SUBMIT_BOX_COLOR)
 
-        self.settings.SOLVE_BOX_COLOR = solve_mouse_status["color"]
-        self.settings.CHECK_BOX_COLOR = check_box_mouse_status["color"]
-        self.settings.SUBMIT_BOX_COLOR = submit_mouse_status["color"]
+        self.solve_box_color = solve_mouse_status["color"]
+        self.check_box_color = check_box_mouse_status["color"]
+        self.submit_box_color = submit_mouse_status["color"]
 
         empty_pos = self.Solver.find_empty()
         self.event_loop()
@@ -398,13 +381,13 @@ class GameWindow:
                 self.elapsed_seconds = str(self.elapsed_time - (int(self.elapsed_minutes) * 60))
                 self.elapsed_seconds = f"{'0' * (2 - len(self.elapsed_seconds))}{self.elapsed_seconds}"
 
-            solve_mouse_status = self.make_buttons_responsive(self.settings.SOLVE_BOX_RECT)
-            check_box_mouse_status = self.make_buttons_responsive(self.settings.CHECK_BOX_RECT)
-            submit_mouse_status = self.make_buttons_responsive(self.settings.SUBMIT_BOX_RECT)
+            solve_mouse_status = self.settings.make_buttons_responsive(self.settings.SOLVE_BOX_RECT, self.settings.SOLVE_BOX_COLOR)
+            check_box_mouse_status = self.settings.make_buttons_responsive(self.settings.CHECK_BOX_RECT, self.settings.CHECK_BOX_COLOR)
+            submit_mouse_status = self.settings.make_buttons_responsive(self.settings.SUBMIT_BOX_RECT, self.settings.SUBMIT_BOX_COLOR)
 
-            self.settings.SOLVE_BOX_COLOR = solve_mouse_status["color"]
-            self.settings.CHECK_BOX_COLOR = check_box_mouse_status["color"]
-            self.settings.SUBMIT_BOX_COLOR = submit_mouse_status["color"]
+            self.solve_box_color = solve_mouse_status["color"]
+            self.check_box_color = check_box_mouse_status["color"]
+            self.submit_box_color = submit_mouse_status["color"]
 
             self.is_solving = solve_mouse_status["is-pressed"]
 
@@ -416,14 +399,7 @@ class GameWindow:
                 self.is_solving = False
 
             elif submit_mouse_status["is-pressed"] and self.is_solved:
-
-                # pygame.quit()
-
-                return {
-                    "computer-solved": self.computer_solved,
-                    "secs": self.elapsed_seconds,
-                    "mins": self.elapsed_minutes,
-                }
+                self.loop_running = False
 
             if check_box_mouse_status["is-pressed"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"]:
                 self.check_box_change_colors()
@@ -450,10 +426,16 @@ class GameWindow:
 
             self.settings.clock.tick(self.settings.FPS)
 
+        return {
+            "computer-solved": self.computer_solved,
+            "secs": self.elapsed_seconds,
+            "mins": self.elapsed_minutes,
+        }
 
 if __name__ == "__main__":
     settings = PygameConfig()
 
     Game = GameWindow("medium", settings)
     game_data = Game.main()
-    # print(game_data)
+    pygame.quit()
+    print(game_data)
