@@ -12,33 +12,10 @@ class LobbyWindow:
 
         self.play_box_color = self.settings.PLAY_BOX_COLOR
         self.toggle_box_color = self.settings.SHOW_SOLVE_BUTTON_COLOR
-        self.help_circle_color = self.settings.HELP_CIRCLE_COLOR
 
         self.show_solve_counter = 0
         self.left_arrow_counter = 0
         self.right_arrow_counter = 0
-
-    def check_mouse_help_circle_overlap(self):
-        """Checks if the mouse is colliding with the circle."""
-
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_is_pressed = pygame.mouse.get_pressed()[0] == 1
-        is_hovering = False
-
-        dist_x = mouse_pos[0] - self.settings.HELP_CIRCLE_RECT.centerx
-        dist_y = mouse_pos[1] - self.settings.HELP_CIRCLE_RECT.centery
-
-        if hypot(dist_x, dist_y) < self.settings.HELP_CIRCLE_RADIUS:
-            self.help_circle_color = self.settings.HELP_HOVERING_CIRCLE_COLOR
-            if mouse_is_pressed:
-                self.help_circle_color = self.settings.HELP_CLICK_CIRCLE_COLOR
-                is_hovering = True
-        else:
-            self.help_circle_color = self.settings.HELP_CIRCLE_COLOR
-
-        return {
-            "is-pressed": mouse_is_pressed and is_hovering
-        }
 
     def draw_window(self):
         """Draws the lobby window."""
@@ -72,13 +49,6 @@ class LobbyWindow:
             self.settings.TOGGLE_SHOW_SOLVE_FONT
         )
 
-        help_circle_text = self.settings.write_center_text(
-            "?",
-            self.settings.HELP_CIRCLE_RECT,
-            (0, 0, 0),
-            self.settings.TOGGLE_SHOW_SOLVE_FONT
-        )
-
         self.settings.win.blit(heading_text["text"], heading_text["rect"])
 
         pygame.draw.rect(self.settings.win, self.settings.LOBBY_WINDOW_BOXES_COLOR, self.settings.DIFFICULTY_BOX_RECT)
@@ -107,9 +77,6 @@ class LobbyWindow:
         pygame.draw.rect(self.settings.win, self.toggle_box_color, self.settings.TOGGLE_SHOW_SOLVE_BUTTON_RECT)
         pygame.draw.rect(self.settings.win, (0, 0, 0), (self.settings.TOGGLE_SHOW_SOLVE_BUTTON_RECT.x - 1, self.settings.TOGGLE_SHOW_SOLVE_BUTTON_RECT.y - 1, self.settings.TOGGLE_SHOW_SOLVE_BUTTON_RECT.width + 2, self.settings.TOGGLE_SHOW_SOLVE_BUTTON_RECT.height + 2), 1)
 
-        pygame.draw.circle(self.settings.win, self.help_circle_color, (self.settings.HELP_CIRCLE_X, self.settings.HELP_CIRCLE_Y), self.settings.HELP_CIRCLE_RADIUS)
-        self.settings.win.blit(help_circle_text["text"], help_circle_text["rect"])
-
     def event_loop(self):
         """This event loop checks for the mouse hovers and clicks on the intro window."""
 
@@ -124,7 +91,6 @@ class LobbyWindow:
         while self.loop_running:
 
             self.event_loop()
-            help_circle_status = self.check_mouse_help_circle_overlap()
 
             play_mouse_status = self.settings.make_buttons_responsive(self.settings.PLAY_BOX_RECT, self.settings.PLAY_BOX_COLOR)
             toggle_mouse_status = self.settings.make_buttons_responsive(self.settings.TOGGLE_SHOW_SOLVE_BUTTON_RECT, self.settings.SHOW_SOLVE_BUTTON_COLOR)
@@ -164,10 +130,6 @@ class LobbyWindow:
                     self.show_solve_counter = 0
 
             if play_mouse_status["is-pressed"]:
-                self.loop_running = False
-                show_solve = self.toggle_box_color == self.settings.SHOW_SOLVE_BUTTON_COLOR
-
-            if help_circle_status["is-pressed"]:
                 self.loop_running = False
                 show_solve = self.toggle_box_color == self.settings.SHOW_SOLVE_BUTTON_COLOR
 

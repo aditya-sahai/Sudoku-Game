@@ -199,6 +199,22 @@ class PygameConfig:
         self.TOGGLE_SHOW_SOLVE_FONT = pygame.font.Font("Fonts/Howkins.ttf", 50)
         # ---------------------------------------- Lobby Window Config Ends Here
 
+        # ------------------------------------------------- Result Window Config
+        self.NOTE_X = 0
+        self.NOTE_Y = self.HEIGHT - self.BLOCK_SIZE
+        self.NOTE_WIDTH = self.WIDTH
+        self.NOTE_HEIGHT = self.BLOCK_SIZE
+        self.NOTE_RECT = pygame.Rect(
+             self.NOTE_X,
+             self.NOTE_Y,
+             self.NOTE_WIDTH,
+             self.NOTE_HEIGHT
+        )
+
+        self.GAME_STATS_FONT = pygame.font.Font("Fonts/Howkins.ttf", 100)
+        self.NOTE_FONT = pygame.font.Font("Fonts/Howkins.ttf", 35)
+        # --------------------------------------- Result Window Config Ends Here
+
     def write_center_text(self, text, rect, color, font):
         """Writes the given text at the center of the given rect"""
 

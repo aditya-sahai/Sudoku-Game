@@ -8,6 +8,7 @@ import time
 class GameWindow:
     def __init__(self, difficulty, settings):
         self.settings = settings
+        self.DIFFICULTY = difficulty
 
         self.loop_running = True
         self.sudoku_surface = pygame.Surface((self.settings.SUDOKU_WIDTH, self.settings.SUDOKU_HEIGHT))
@@ -404,7 +405,7 @@ class GameWindow:
             if check_box_mouse_status["is-pressed"] and self.SudokuGenerator.grid[self.selected_row][self.selected_col]["can-change"]:
                 self.check_box_change_colors()
 
-            if submit_mouse_status["is-pressed"]:
+            if submit_mouse_status["is-pressed"] and not self.is_solved:
                 solved_status = self.check_submitted_sudoku()
                 if solved_status:
                     self.computer_solved = False
@@ -428,6 +429,7 @@ class GameWindow:
 
         return {
             "computer-solved": self.computer_solved,
+            "difficulty": self.DIFFICULTY,
             "secs": self.elapsed_seconds,
             "mins": self.elapsed_minutes,
         }
