@@ -6,16 +6,21 @@ import time
 
 
 class GameWindow:
-    def __init__(self, difficulty, settings):
+    def __init__(self, lobby_data, settings):
         self.settings = settings
-        self.DIFFICULTY = difficulty
+        self.DIFFICULTY = lobby_data["difficulty"]
+        self.SHOW_SOLVE = lobby_data["show-solve"]
 
         self.loop_running = True
         self.sudoku_surface = pygame.Surface((self.settings.SUDOKU_WIDTH, self.settings.SUDOKU_HEIGHT))
 
         self.SudokuGenerator = SudokuGenerator()
         self.SudokuGenerator.generate_board()
-        self.SudokuGenerator.remove_values(difficulty)
+
+        for row in self.SudokuGenerator.grid:
+            print(row)
+
+        self.SudokuGenerator.remove_values(self.DIFFICULTY)
         self.get_grid_dict()
 
         self.Solver = Solver(self.SudokuGenerator.grid)
@@ -34,6 +39,8 @@ class GameWindow:
         self.elapsed_time = 60 # round(time.time() - self.sudoku_start_time, 2)
         self.elapsed_minutes = int(self.elapsed_time // 60)
         self.elapsed_seconds = self.elapsed_time - (self.elapsed_minutes * 60)
+
+        self.submit_counter = 0
 
     def get_grid_dict(self):
         """Gets a 2d list containing dicts instead of just numbers."""
@@ -251,9 +258,10 @@ class GameWindow:
         check_box_mouse_status = self.settings.make_buttons_responsive(self.settings.CHECK_BOX_RECT, self.settings.CHECK_BOX_COLOR)
         submit_mouse_status = self.settings.make_buttons_responsive(self.settings.SUBMIT_BOX_RECT, self.settings.SUBMIT_BOX_COLOR)
 
-        self.solve_box_color = solve_mouse_status["color"]
-        self.check_box_color = check_box_mouse_status["color"]
-        self.submit_box_color = submit_mouse_status["color"]
+        if self.SHOW_SOLVE:
+            self.solve_box_color = solve_mouse_status["color"]
+            self.check_box_color = check_box_mouse_status["color"]
+            self.submit_box_color = submit_mouse_status["color"]
 
         empty_pos = self.Solver.find_empty()
         self.event_loop()
@@ -270,10 +278,11 @@ class GameWindow:
                 self.selected_row = row
                 self.selected_col = col
 
-                self.draw_window()
-                pygame.display.update()
+                if self.SHOW_SOLVE:
+                    self.draw_window()
+                    pygame.display.update()
 
-                self.settings.clock.tick(self.settings.FPS * 4)
+                    self.settings.clock.tick(self.settings.FPS * 4)
 
                 if self.solve():
                     return True
@@ -348,8 +357,8 @@ class GameWindow:
             is_valid = False
 
         else:
-            if self.is_solving:
-                self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (100, 255, 100)
+            # if self.is_solving:
+            self.SudokuGenerator.grid[self.selected_row][self.selected_col]["bg-color"] = (100, 255, 100)
             is_valid = True
 
         self.initial_time_check_num = time.time()
@@ -406,9 +415,12 @@ class GameWindow:
                 self.check_box_change_colors()
 
             if submit_mouse_status["is-pressed"] and not self.is_solved:
+                self.submit_counter = 0
                 solved_status = self.check_submitted_sudoku()
-                if solved_status:
+                if solved_status and self.submit_counter > 30:
                     self.computer_solved = False
+                    self.is_solved = True
+                    self.is_solving = False
 
             if not self.is_solved:
                 self.update_grid()
@@ -421,7 +433,7 @@ class GameWindow:
                 self.initial_time_check_num = 0
                 self.elapsed_time_check_box = 0
 
-
+            self.submit_counter += 1
             self.draw_window()
             pygame.display.update()
 

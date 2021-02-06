@@ -2,7 +2,7 @@ import pygame
 from PygameConfig import PygameConfig
 
 class ResultWindow:
-    def __init__(self, settings, game_data):
+    def __init__(self, game_data, settings):
         self.MINUTES = game_data["mins"]
         self.SECONDS = game_data["secs"]
         self.DIFFICULTY = game_data["difficulty"]
@@ -82,9 +82,6 @@ class ResultWindow:
             pygame.display.update()
 
             self.settings.clock.tick(self.settings.FPS)
-
-        pygame.quit()
-        exit()
 
 
 if __name__ == "__main__":
